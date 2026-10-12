@@ -29,11 +29,19 @@ export function GameCard({ game }: { game: CatalogGame }) {
           {playable ? ` · ${game.modes.join(" · ")}` : ""}
         </p>
         <p className="mt-2 line-clamp-2 text-sm text-ink-soft">{playable ? game.summary : game.playersNote}</p>
-        <div className="mt-auto pt-3">
+        <div className="mt-auto flex flex-col items-start gap-1 pt-3">
           {playable ? (
-            <Link href="/create?game=reversi" className={buttonClass.solid}>
-              Set up Reversi
-            </Link>
+            <>
+              <Link href="/games/reversi/practice" className={buttonClass.solid}>
+                Play vs Computer
+              </Link>
+              <Link href="/create?game=reversi" className={buttonClass.text}>
+                Set up Reversi
+              </Link>
+              <Link href="/games/reversi/help" className={buttonClass.text}>
+                Help & Rules
+              </Link>
+            </>
           ) : (
             <Link href={`/games/${game.id}`} className={buttonClass.quiet}>
               Learn more

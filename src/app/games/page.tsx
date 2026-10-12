@@ -35,8 +35,16 @@ export default function GamesPage() {
           Practice on this device
         </h2>
         <p className="mt-2 text-sm text-ink-soft">
-          Casual and untimed Reversi. Both seats are here, so this is not a challenge and it does not change a rating.
-          There is no computer opponent.
+          Casual and untimed Reversi with a friend at the other seat. Both seats are on this device, so this is not a
+          challenge and it does not change a rating.
+        </p>
+        <p className="mt-3">
+          <Link href="/games/reversi/practice" className={buttonClass.quiet}>
+            Play vs Computer
+          </Link>
+        </p>
+        <p className="mt-2 text-sm text-ink-soft">
+          Practice against the computer is separate. It is not rated and it does not open a challenge.
         </p>
         <form
           className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"

@@ -23,7 +23,7 @@ export const GAME_CATALOG: readonly CatalogGame[] = [
     playersNote: "The only table open in this prototype.",
     status: "playable",
     statusLabel: "Playable now",
-    modes: ["Casual", "Rated"],
+    modes: ["Casual", "Rated", "Practice"],
   },
   {
     id: "chess",

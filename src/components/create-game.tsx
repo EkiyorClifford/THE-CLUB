@@ -139,7 +139,11 @@ export function CreateGame({ initialGame }: { initialGame: GameId | null }) {
             One friend
           </h2>
           <p className="mt-2 max-w-xl text-sm text-ink-soft">
-            Reversi seats two. There is no computer opponent and no table for people outside your friends.
+            Reversi seats two friends. People outside your friends cannot be invited.{" "}
+            <Link href="/games/reversi/practice" className="underline underline-offset-4">
+              Play vs Computer
+            </Link>{" "}
+            is practice, and it is not rated.
           </p>
           {friends.length === 0 ? (
             <p className="mt-4 text-ink-soft">You need a friend before this table can be set.</p>

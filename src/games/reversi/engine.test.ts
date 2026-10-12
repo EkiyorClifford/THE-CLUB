@@ -106,6 +106,40 @@ describe("flips, passes, and completion", () => {
     expect(result.state.board[4]?.[3]).toBe("dark");
   });
 
+  it("flips two discs along a diagonal", () => {
+    const board = boardFromDiagram(`
+      D.....D.
+      .L...L..
+      ..L.L...
+      ........
+      ..L.L...
+      .L...L..
+      D.....D.
+      ........
+    `);
+    const flipped = discsFlipped(board, { row: 3, col: 3 }, "dark");
+    expect(flipped).toHaveLength(8);
+    const result = applyMove(
+      {
+        board,
+        toMove: "dark",
+        lastMove: null,
+        status: "playing",
+        winner: null,
+        endReason: null,
+        log: [],
+      },
+      { row: 3, col: 3 },
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.board[1]?.[1]).toBe("dark");
+    expect(result.state.board[2]?.[2]).toBe("dark");
+    expect(result.state.board[1]?.[5]).toBe("dark");
+    expect(result.state.board[5]?.[5]).toBe("dark");
+    expect(result.state.log[0]).toMatchObject({ flipped: 8 });
+  });
+
   it("passes when the side to move has no legal move", () => {
     const board = boardFromDiagram(`
       LD......

@@ -27,9 +27,22 @@ export default async function GameDetailPage({ params }: { params: Promise<{ gam
           <p className="mt-4 text-sm font-semibold">{game.players}</p>
           <p className="text-sm text-ink-soft">{playable ? game.modes.join(" · ") : game.playersNote}</p>
           {playable ? (
-            <Link href="/create?game=reversi" className={`${buttonClass.solid} mt-5`}>
-              Set up Reversi
-            </Link>
+            <p className="mt-3 max-w-xl text-sm text-ink-soft">
+              Play vs Computer is practice on this device. It is not a rated match. A challenge still seats two friends.
+            </p>
+          ) : null}
+          {playable ? (
+            <div className="mt-5 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap">
+              <Link href="/games/reversi/practice" className={buttonClass.solid}>
+                Play vs Computer
+              </Link>
+              <Link href="/create?game=reversi" className={buttonClass.quiet}>
+                Set up Reversi
+              </Link>
+              <Link href="/games/reversi/help" className={buttonClass.quiet}>
+                Help & Rules
+              </Link>
+            </div>
           ) : (
             <p className="mt-5 max-w-xl text-sm text-ink-soft">
               This preview is the game as the club intends it. It does not open a match.
