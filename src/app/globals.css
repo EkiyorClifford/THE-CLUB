@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f3eee6;
+  --paper-raised: #faf7f2;
+  --paper-sunk: #e6dfd2;
+  --ink: #1b1714;
+  --ink-soft: #5c534a;
+  --ink-faint: #8a7f72;
+  --line: #d4cbbd;
+  --oxblood: #6e2926;
+  --brass: #8d7043;
+  --felt: #17362c;
+  --felt-deep: #10261f;
+  --felt-line: #2a5646;
+  --disc-dark: #14110e;
+  --disc-light: #f4efe4;
+  --online: #2a6b45;
+  --focus: #1b1714;
+  --background: var(--paper);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-paper-sunk: var(--paper-sunk);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-oxblood: var(--oxblood);
+  --color-brass: var(--brass);
+  --color-felt: var(--felt);
+  --color-felt-deep: var(--felt-deep);
+  --color-felt-line: var(--felt-line);
+  --color-disc-dark: var(--disc-dark);
+  --color-disc-light: var(--disc-light);
+  --color-online: var(--online);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-source), "Segoe UI", sans-serif;
+  --font-display: var(--font-display-family), Georgia, "Times New Roman", serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-source), "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  ::selection {
+    background: #e4d3c2;
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .eyebrow {
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .skip-link {
+    background: var(--ink);
+    color: var(--paper-raised);
+    left: 1rem;
+    padding: 0.5rem 0.75rem;
+    position: absolute;
+    top: -4rem;
+    z-index: 20;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  .disc {
+    border-radius: 999px;
+    display: block;
+    height: 72%;
+    transition: background-color 160ms ease, border-color 160ms ease;
+    width: 72%;
+  }
+
+  .disc-dark {
+    background: var(--disc-dark);
+    border: 1px solid #2c261f;
+  }
+
+  .disc-light {
+    background: var(--disc-light);
+    border: 1px solid #d9d0c2;
+  }
+
+  .board-square:focus-visible {
+    outline: 2px solid var(--disc-light);
+    outline-offset: -3px;
+  }
+}
