@@ -45,6 +45,23 @@ describe("reversi opening", () => {
     });
     expect(start.board[4]?.[3]).toBe("light");
   });
+
+  it("does not share the next board with the previous state", () => {
+    const start = initialState();
+    const result = applyMove(start, notationToSquare("c4")!);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const placed = result.state.board[4];
+    if (!placed) throw new Error("missing row");
+    placed[2] = "light";
+    expect(start.board[4]?.[2]).toBeNull();
+    expect(start.board[4]?.[3]).toBe("light");
+    const again = applyMove(start, notationToSquare("c4")!);
+    expect(again.ok).toBe(true);
+    if (!again.ok) return;
+    expect(again.state.board[4]?.[2]).toBe("dark");
+    expect(again.state.board[4]?.[3]).toBe("dark");
+  });
 });
 
 describe("illegal moves", () => {
@@ -68,6 +85,8 @@ describe("illegal moves", () => {
   it("rejects a square off the board", () => {
     const result = applyMove(initialState(), { row: 8, col: 0 });
     expect(result.ok).toBe(false);
+    expect(applyMove(initialState(), { row: -1, col: 0 }).ok).toBe(false);
+    expect(applyMove(initialState(), { row: 0, col: 8 }).ok).toBe(false);
   });
 });
 
@@ -104,6 +123,35 @@ describe("flips, passes, and completion", () => {
     expect(result.state.board[3]?.[2]).toBe("dark");
     expect(result.state.board[3]?.[4]).toBe("dark");
     expect(result.state.board[4]?.[3]).toBe("dark");
+  });
+
+  it("does not flip a line that is not closed by a friendly disc", () => {
+    const board = boardFromDiagram(`
+      L.......
+      ........
+      ........
+      ........
+      ........
+      ........
+      ........
+      ........
+    `);
+    expect(discsFlipped(board, { row: 0, col: 1 }, "dark")).toEqual([]);
+    const result = applyMove(
+      {
+        board,
+        toMove: "dark",
+        lastMove: null,
+        status: "playing",
+        winner: null,
+        endReason: null,
+        log: [],
+      },
+      { row: 0, col: 1 },
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.state.board).toBe(board);
   });
 
   it("flips two discs along a diagonal", () => {

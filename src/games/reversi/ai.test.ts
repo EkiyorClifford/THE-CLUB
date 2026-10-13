@@ -4,6 +4,7 @@ import { chooseComputerMove, evaluateFor, type Difficulty } from "./ai";
 import {
   applyMove,
   boardFromDiagram,
+  completedFromBoard,
   initialState,
   legalMoves,
   opposite,
@@ -267,4 +268,95 @@ describe("computer moves", () => {
     if (tally.dark === tally.light) expect(state.winner).toBe("draw");
     else expect(state.winner).toBe(tally.dark > tally.light ? "dark" : "light");
   });
+
+  it("returns no move from a finished game and does not mutate the input", () => {
+    const done = completedFromBoard(
+      boardFromDiagram(`
+        DDDDDDDD
+        DDDDDDDD
+        DDDDDDDD
+        DDDDDDDD
+        DDDDDDDD
+        LLLLLLLL
+        LLLLLLLL
+        LLLLLLLL
+      `),
+    );
+    const before = done.board.map((row) => [...row]);
+    for (const difficulty of DIFFICULTIES) {
+      expect(chooseComputerMove(done, difficulty, () => 0.5)).toBeNull();
+    }
+    expect(done.board).toEqual(before);
+    expect(done.status).toBe("complete");
+  });
+
+  it("finishes a seeded game from either human colour", () => {
+    for (const human of ["dark", "light"] as const) {
+      const finished = playSeat(human);
+      expect(finished.status).toBe("complete");
+      const tally = score(finished.board);
+      const occupied = tally.dark + tally.light;
+      expect(occupied).toBeGreaterThan(4);
+      expect(occupied).toBeLessThanOrEqual(64);
+      if (tally.dark === tally.light) expect(finished.winner).toBe("draw");
+      else expect(finished.winner).toBe(tally.dark > tally.light ? "dark" : "light");
+      expect(applyMove(finished, { row: 0, col: 0 }).ok).toBe(false);
+    }
+  });
+
+  it("keeps a hard search fast enough for a turn and legal", () => {
+    const openingStarted = performance.now();
+    const openingMove = chooseComputerMove(initialState(), "hard");
+    const openingMs = performance.now() - openingStarted;
+    expect(openingMove).not.toBeNull();
+    expect(applyMove(initialState(), openingMove!).ok).toBe(true);
+    expect(openingMs).toBeLessThan(1000);
+
+    let state = initialState();
+    for (let ply = 0; ply < 12 && state.status === "playing"; ply += 1) {
+      const move = chooseComputerMove(state, "easy", () => 0);
+      if (!move) {
+        state = resolveTurn(state);
+        continue;
+      }
+      const result = applyMove(state, move);
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      state = result.state;
+    }
+    if (state.status !== "playing") return;
+    const middleStarted = performance.now();
+    const middleMove = chooseComputerMove(state, "hard");
+    const middleMs = performance.now() - middleStarted;
+    if (middleMove) expect(applyMove(state, middleMove).ok).toBe(true);
+    else expect(legalMoves(state)).toHaveLength(0);
+    expect(middleMs).toBeLessThan(1000);
+  });
 });
+
+function playSeat(human: Disc): ReversiState {
+  let state = initialState();
+  const computer = opposite(human);
+  for (let guard = 0; guard < 80 && state.status === "playing"; guard += 1) {
+    if (state.toMove === computer) {
+      const move = chooseComputerMove(state, "easy", () => 0);
+      if (!move) {
+        state = resolveTurn(state);
+        continue;
+      }
+      const result = applyMove(state, move);
+      if (!result.ok) throw new Error("Computer move was illegal.");
+      state = result.state;
+      continue;
+    }
+    const humanMove = legalMoves(state)[0];
+    if (!humanMove) {
+      state = resolveTurn(state);
+      continue;
+    }
+    const result = applyMove(state, humanMove);
+    if (!result.ok) throw new Error("Human move was illegal.");
+    state = result.state;
+  }
+  return state;
+}
