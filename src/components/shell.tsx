@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { signOut } from "@/app/sign-in/actions";
 import { pendingIncomingCount } from "@/domain/challenges";
 import { buttonClass, cx } from "@/lib/cx";
 import { useClub } from "@/prototype/store";
 
 import { ChallengeTray } from "./challenge-tray";
-import { Monogram } from "./monogram";
 
 const NAV = [
   { href: "/", label: "Lobby" },
@@ -19,7 +19,13 @@ const NAV = [
   { href: "/messages", label: "Messages" },
 ];
 
-export function Shell({ children }: { children: React.ReactNode }) {
+export function Shell({
+  children,
+  account,
+}: {
+  children: React.ReactNode;
+  account: { displayName: string } | null;
+}) {
   const pathname = usePathname();
   const club = useClub();
   const incoming = pendingIncomingCount(club.state, club.you.id, club.now);
@@ -55,13 +61,21 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 {incoming}
               </span>
             </button>
-            <Link
-              href={`/members/${club.you.username}`}
-              className="inline-flex min-h-11 items-center gap-2 rounded-[2px] pr-1"
-            >
-              <Monogram name={club.you.displayName} />
-              <span className="hidden text-sm font-semibold md:inline">{club.you.displayName}</span>
-            </Link>
+            {account ? (
+              <div className="text-right">
+                <p className="text-sm font-semibold">{account.displayName}</p>
+                <p className="text-xs text-ink-soft">Sample tables stay on this device.</p>
+                <form action={signOut}>
+                  <button type="submit" className={buttonClass.text}>
+                    Sign out
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <Link href="/sign-in" className={buttonClass.text}>
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
         <nav aria-label="Club" className="mx-auto hidden w-full max-w-6xl gap-1 overflow-x-auto px-3 pb-2 sm:px-5 md:flex">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 
 import { Shell } from "@/components/shell";
+import { getSignedInAccount } from "@/lib/auth/account";
 import { ClubProvider } from "@/prototype/store";
 
 import "./globals.css";
@@ -24,12 +25,14 @@ export const metadata: Metadata = {
   description: "A private board-game club for Reversi, and later chess and Scrabble.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const account = await getSignedInAccount();
+
   return (
     <html lang="en" className={`${sourceSans.variable} ${fraunces.variable} h-full antialiased`}>
       <body className="min-h-dvh bg-paper text-ink">
         <ClubProvider>
-          <Shell>{children}</Shell>
+          <Shell account={account}>{children}</Shell>
         </ClubProvider>
       </body>
     </html>
