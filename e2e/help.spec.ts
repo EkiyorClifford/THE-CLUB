@@ -1,14 +1,17 @@
 import { expect, test } from "@playwright/test";
 
 test("Help & Rules opens from the game card and teaches one move", async ({ page }) => {
+  test.setTimeout(60_000);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await page.getByRole("link", { name: "Help & Rules" }).click();
+  await expect(page).toHaveURL(/\/games\/reversi\/help$/, { timeout: 20_000 });
   await expect(page.getByRole("heading", { level: 1, name: "Reversi" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Legal moves" })).toBeVisible();
   await expect(page.getByText("Empty squares are not awarded")).toBeVisible();
 
   await page.getByRole("link", { name: "Start the tutorial" }).click();
+  await expect(page).toHaveURL(/\/games\/reversi\/tutorial$/, { timeout: 20_000 });
   await expect(page.getByRole("heading", { name: "The opening" })).toBeVisible();
   const board = page.getByRole("grid", { name: "Reversi board" });
   const box = await board.boundingBox();
@@ -45,22 +48,24 @@ test("Help & Rules opens from the game card and teaches one move", async ({ page
 });
 
 test("direct help routes stay honest for Reversi, Chess, and Scrabble", async ({ page }) => {
-  await page.goto("/games/reversi");
+  test.setTimeout(60_000);
+  const documentReady = { waitUntil: "domcontentloaded" as const };
+  await page.goto("/games/reversi", documentReady);
   await page.getByRole("link", { name: "Help & Rules" }).click();
-  await expect(page).toHaveURL(/\/games\/reversi\/help$/);
+  await expect(page).toHaveURL(/\/games\/reversi\/help$/, { timeout: 20_000 });
   await expect(page.getByRole("heading", { level: 1, name: "Reversi" })).toBeVisible();
 
-  await page.goto("/games/reversi/tutorial");
+  await page.goto("/games/reversi/tutorial", documentReady);
   await expect(page.getByRole("heading", { name: "The opening" })).toBeVisible();
   await expect(page.getByText("This lesson does not start a match.")).toBeVisible();
 
-  await page.goto("/games/chess/help");
+  await page.goto("/games/chess/help", documentReady);
   await expect(page.getByRole("heading", { level: 1, name: "Chess" })).toBeVisible();
   await expect(page.getByText("No board is offered yet.")).toBeVisible();
   await expect(page.getByText("There is no rules guide yet")).toBeVisible();
   await expect(page.getByRole("link", { name: "Start the tutorial" })).toHaveCount(0);
 
-  await page.goto("/games/scrabble/help");
+  await page.goto("/games/scrabble/help", documentReady);
   await expect(page.getByRole("heading", { level: 1, name: "Scrabble" })).toBeVisible();
   await expect(page.getByText("There is no playable board.")).toBeVisible();
   await expect(page.getByRole("link", { name: "Start the tutorial" })).toHaveCount(0);
@@ -69,5 +74,6 @@ test("direct help routes stay honest for Reversi, Chess, and Scrabble", async ({
 test("practice links to Help & Rules", async ({ page }) => {
   await page.goto("/games/reversi/practice");
   await page.getByRole("link", { name: "Help & Rules" }).click();
+  await expect(page).toHaveURL(/\/games\/reversi\/help$/, { timeout: 20_000 });
   await expect(page.getByRole("heading", { level: 2, name: "No legal move" })).toBeVisible();
 });

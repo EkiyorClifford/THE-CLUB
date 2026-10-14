@@ -10,6 +10,7 @@ import { buttonClass, cx } from "@/lib/cx";
 import { useClub } from "@/prototype/store";
 
 import { ChallengeTray } from "./challenge-tray";
+import { useSignedInAccount } from "./signed-in-account";
 
 const NAV = [
   { href: "/", label: "Lobby" },
@@ -19,15 +20,10 @@ const NAV = [
   { href: "/messages", label: "Messages" },
 ];
 
-export function Shell({
-  children,
-  account,
-}: {
-  children: React.ReactNode;
-  account: { displayName: string } | null;
-}) {
+export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const club = useClub();
+  const account = useSignedInAccount();
   const incoming = pendingIncomingCount(club.state, club.you.id, club.now);
   const [tray, setTray] = useState(false);
   const [trayPath, setTrayPath] = useState(pathname);
@@ -43,36 +39,42 @@ export function Shell({
         Skip to content
       </a>
       <header className="border-b border-line">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
           <Link href="/" className="font-display text-[1.7rem] italic leading-none font-medium tracking-tight">
             The Club
           </Link>
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-3">
             <button
               type="button"
-              className="inline-flex min-h-11 items-center gap-2 rounded-[2px] px-2 text-sm font-semibold"
+              className="inline-flex min-h-11 items-center gap-2 rounded-md border border-line bg-paper-raised px-3 text-sm font-semibold text-ink"
               aria-label={challengeLabel}
               aria-expanded={tray}
               onClick={() => setTray((open) => !open)}
             >
-              <ChallengeMark />
-              <span className="hidden sm:inline">Challenges</span>
-              <span className="inline-grid min-h-6 min-w-6 place-items-center bg-oxblood px-1.5 text-xs font-semibold text-paper-raised tabular-nums">
+              <ChallengeIcon />
+              <span>Challenges</span>
+              <span className="inline-grid min-h-6 min-w-6 place-items-center rounded-full bg-oxblood px-1.5 text-xs font-semibold text-paper-raised tabular-nums">
                 {incoming}
               </span>
             </button>
             {account ? (
-              <div className="text-right">
-                <p className="text-sm font-semibold">{account.displayName}</p>
-                <p className="text-xs text-ink-soft">Sample tables stay on this device.</p>
+              <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                <div className="min-w-0 max-w-[9.5rem] text-right sm:max-w-[14rem]">
+                  <p className="truncate text-sm font-semibold">{account.displayName}</p>
+                  <p className="truncate text-xs text-ink-soft">Sample tables stay on this device.</p>
+                </div>
                 <form action={signOut}>
-                  <button type="submit" className={buttonClass.text}>
+                  <button
+                    type="submit"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-md border border-line px-3 text-sm font-semibold text-ink"
+                  >
+                    <SignOutIcon />
                     Sign out
                   </button>
                 </form>
               </div>
             ) : (
-              <Link href="/sign-in" className={buttonClass.text}>
+              <Link href="/sign-in" className={buttonClass.quiet}>
                 Sign in
               </Link>
             )}
@@ -144,11 +146,30 @@ export function Shell({
   );
 }
 
-function ChallengeMark() {
+function ChallengeIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
-      <rect x="3" y="2" width="16" height="18" fill="none" stroke="currentColor" strokeWidth="1.4" />
-      <path d="M7 8h8M7 12h8M7 16h5" stroke="currentColor" strokeWidth="1.4" />
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
+      <path
+        d="M8 10h8M8 14h5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6 5.5h12a2 2 0 0 1 2 2v8.2a2 2 0 0 1-2 2H11l-4.2 3.1V17.7H6a2 2 0 0 1-2-2V7.5a2 2 0 0 1 2-2Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function SignOutIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0">
+      <path d="M10 7V5.5A1.5 1.5 0 0 1 11.5 4h7A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 10 18.5V17" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M4 12h10M11 8.5 14.5 12 11 15.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

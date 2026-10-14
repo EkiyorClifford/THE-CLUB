@@ -6,11 +6,13 @@ import Link from "next/link";
 import { GAME_CATALOG } from "@/domain/games";
 import { modeLabel, timeControlLabel } from "@/domain/format";
 import { buttonClass } from "@/lib/cx";
+import { lobbyGreeting } from "@/lib/auth/greeting";
 import { useClub } from "@/prototype/store";
 
 import { ChallengeRow } from "./challenge-row";
 import { GameCard } from "./game-card";
 import { Monogram, Presence } from "./monogram";
+import { useSignedInAccount } from "./signed-in-account";
 
 export function Lobby() {
   const club = useClub();
@@ -27,17 +29,17 @@ export function Lobby() {
     .filter((member) => member !== null)
     .sort((a, b) => Number(b.presence === "online") - Number(a.presence === "online") || a.displayName.localeCompare(b.displayName));
   const recent = club.state.matches.filter((match) => match.status === "complete").slice(0, 3);
-  const firstName = club.you.displayName.split(" ")[0];
+  const account = useSignedInAccount();
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 sm:py-8">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="eyebrow">Your private table</p>
-          <h1 className="mt-1 font-display text-4xl leading-none font-medium tracking-tight sm:text-5xl">
-            Welcome back, {firstName}.
+    <div className="mx-auto w-full min-w-0 max-w-6xl px-4 py-5 sm:px-6 sm:py-8">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <p className="eyebrow">Sample table</p>
+          <h1 className="mt-2 break-words font-display text-4xl leading-none font-medium tracking-tight sm:text-5xl">
+            {lobbyGreeting(account?.displayName)}
           </h1>
-          <p className="mt-2 text-ink-soft">{lede(active.length, incoming.length)}</p>
+          <p className="mt-3 max-w-xl text-ink-soft">{lede(active.length, incoming.length)} These boards stay on this device.</p>
         </div>
         <p className="font-display text-lg text-ink-soft italic sm:max-w-xs sm:text-right">
           The best games are played with good company.
@@ -60,8 +62,8 @@ export function Lobby() {
         </div>
       </section>
 
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-8">
+      <div className="mt-8 grid min-w-0 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="min-w-0 space-y-8">
           <section aria-labelledby="table-heading">
             <h2 id="table-heading" className="font-display text-2xl font-medium">
               {active.length === 0 ? "No board is out" : "Continue playing"}
@@ -75,7 +77,7 @@ export function Lobby() {
                   const opponent = club.member(opponentId);
                   const yours = (match.state.toMove === "dark" ? match.darkId : match.lightId) === club.you.id;
                   return (
-                    <li key={match.id} className="flex items-center gap-3 rounded-lg border border-line bg-paper-raised p-3">
+                    <li key={match.id} className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg border border-line bg-paper-raised p-3">
                       <Image src="/art/reversi.jpg" alt="" width={128} height={128} className="size-16 shrink-0 rounded-md object-cover" />
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-semibold tracking-wide text-ink-soft uppercase">{yours ? "Your move" : "Waiting"}</p>
@@ -122,7 +124,7 @@ export function Lobby() {
           </section>
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <section className="overflow-hidden rounded-lg border border-line bg-paper-raised" aria-labelledby="challenge-heading">
             <div className="flex items-center justify-between gap-3 bg-oxblood px-4 py-3 text-paper-raised">
               <h2 id="challenge-heading" className="font-display text-xl font-medium">

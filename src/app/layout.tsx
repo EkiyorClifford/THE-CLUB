@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
+import { Suspense } from "react";
 
 import { Shell } from "@/components/shell";
+import { SignedInAccountProvider } from "@/components/signed-in-account";
 import { getSignedInAccount } from "@/lib/auth/account";
 import { ClubProvider } from "@/prototype/store";
 
@@ -25,16 +27,35 @@ export const metadata: Metadata = {
   description: "A private board-game club for Reversi, and later chess and Scrabble.",
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const account = await getSignedInAccount();
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sourceSans.variable} ${fraunces.variable} h-full antialiased`}>
       <body className="min-h-dvh bg-paper text-ink">
-        <ClubProvider>
-          <Shell account={account}>{children}</Shell>
-        </ClubProvider>
+        <Suspense fallback={<ClubFrame account={null}>{children}</ClubFrame>}>
+          <SignedInFrame>{children}</SignedInFrame>
+        </Suspense>
       </body>
     </html>
   );
+}
+
+function ClubFrame({
+  account,
+  children,
+}: {
+  account: { displayName: string } | null;
+  children: React.ReactNode;
+}) {
+  return (
+    <ClubProvider>
+      <SignedInAccountProvider account={account}>
+        <Shell>{children}</Shell>
+      </SignedInAccountProvider>
+    </ClubProvider>
+  );
+}
+
+async function SignedInFrame({ children }: { children: React.ReactNode }) {
+  const account = await getSignedInAccount();
+  return <ClubFrame account={account}>{children}</ClubFrame>;
 }

@@ -1,24 +1,31 @@
 "use client";
 
+import { useSignedInAccount } from "@/components/signed-in-account";
 import { buttonClass } from "@/lib/cx";
 import { useClub } from "@/prototype/store";
 
 export default function ClubPage() {
   const club = useClub();
+  const account = useSignedInAccount();
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <p className="eyebrow">Membership</p>
       <h1 className="mt-2 font-display text-4xl font-medium tracking-tight">The Club</h1>
       <div className="mt-4 max-w-xl space-y-3 text-ink-soft">
-        <p>You are signed in as {club.you.displayName}, a member of this private table.</p>
+        <p>
+          {account
+            ? `You are signed in as ${account.displayName}.`
+            : "You are not signed in."}{" "}
+          The sample challenges, messages, and ratings on this device are not that account.
+        </p>
         <p>
           Friendship and membership are different. Finding someone by username does not open every room, and a friend
           request is not an invitation to the club.
         </p>
         <p>
-          Club invitations, accounts, and authorization are not connected yet. There is no Supabase project in this
-          environment, so nothing here is saved on a server.
+          Invitations are not offered from this screen. Sample challenges, messages, and ratings stay in this browser.
+          They are not your account on the server.
         </p>
       </div>
       <h2 className="mt-10 font-display text-2xl font-medium">What this prototype keeps locally</h2>
